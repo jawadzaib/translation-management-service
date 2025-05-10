@@ -1,0 +1,373 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Translation Management Service",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/login": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Login and retrieve access token",
+                "operationId": "222b2625838e3c57e017987f73598fda",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "example": "user@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful login",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "token": {
+                                            "type": "string",
+                                            "example": "your_token_here"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid credentials"
+                    }
+                }
+            }
+        },
+        "/api/logout": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Logout the authenticated user",
+                "operationId": "ad65cbbd4e9f201619eae184a5961a98",
+                "responses": {
+                    "200": {
+                        "description": "User logged out successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Logged out successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized, user not logged in"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/translations": {
+            "get": {
+                "tags": [
+                    "Translations"
+                ],
+                "summary": "List translations",
+                "operationId": "efd16ed837355f28b11eb7bb16026fcc",
+                "parameters": [
+                    {
+                        "name": "tag",
+                        "in": "query",
+                        "description": "Filter by tag",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "key",
+                        "in": "query",
+                        "description": "Filter by key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "value",
+                        "in": "query",
+                        "description": "Filter by value",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of translations"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Translations"
+                ],
+                "summary": "Create a translation",
+                "operationId": "9e3754941c399ce69fc5fbe61056b96a",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "key": {
+                                        "type": "string",
+                                        "example": "example.title"
+                                    },
+                                    "value": {
+                                        "type": "string",
+                                        "example": "Example"
+                                    },
+                                    "locale": {
+                                        "type": "string",
+                                        "example": "en"
+                                    },
+                                    "tags": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "example": [
+                                            "web",
+                                            "mobile"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Translation created"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/translations/export": {
+            "get": {
+                "tags": [
+                    "Translations"
+                ],
+                "summary": "Export translations as JSON",
+                "description": "Export translations for a specific locale as a flat JSON object.",
+                "operationId": "527d47a6525345f67a3290085a0120ed",
+                "parameters": [
+                    {
+                        "name": "locale",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "en"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Exported translations"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/translations/{id}": {
+            "get": {
+                "tags": [
+                    "Translations"
+                ],
+                "summary": "View a translation",
+                "description": "Get a single translation by ID.",
+                "operationId": "bb8ea02bf7017192333aa2be6acf941c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Translations"
+                ],
+                "summary": "Update a translation",
+                "description": "Update translation by ID.",
+                "operationId": "791252565fe5130039542e229fac90c2",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "key": {
+                                        "type": "string",
+                                        "example": "example.title"
+                                    },
+                                    "value": {
+                                        "type": "string",
+                                        "example": "Updated Example"
+                                    },
+                                    "locale": {
+                                        "type": "string",
+                                        "example": "en"
+                                    },
+                                    "tags": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "web"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Updated successfully"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Translations"
+                ],
+                "summary": "Delete a translation",
+                "description": "Deletes a translation by ID.",
+                "operationId": "75396e7b0a5e44c128f6c8493c25e5e8",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Deleted successfully"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "description": "JWT Token. Example: Bearer {token}",
+                "name": "Authorization",
+                "in": "header",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Translations",
+            "description": "Manage translations across locales"
+        },
+        {
+            "name": "Authentication",
+            "description": "Authentication"
+        }
+    ]
+}
