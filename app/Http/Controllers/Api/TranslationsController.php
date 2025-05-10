@@ -100,30 +100,38 @@ class TranslationsController extends Controller
       *     description="Export translations for a specific locale as a flat JSON object.",
       *     security={{"bearerAuth":{}}},
       *     @OA\Parameter(name="locale", in="query", required=false, @OA\Schema(type="string", example="en")),
+      *     @OA\Parameter(name="tag", in="query", description="Filter by tag", @OA\Schema(type="web")),
       *     @OA\Response(response=200, description="Exported translations")
       * )
       */
      public function export(Request $request)
      {
           $locale = $request->query('locale', 'en');
+          $tag = $request->query('tag');
 
-          $callback = function () use ($locale) {
+          $callback = function () use ($locale, $tag) {
                echo '{';
                $first = true;
-
-               DB::table('translations')
-                    ->where('locale', $locale)
-                    ->orderBy('id')
+          
+               $query = DB::table('translations')
+                    ->select('translations.key', 'translations.value')
+                    ->where('translations.locale', $locale);
+          
+               if ($tag) {
+                    $query->join('tag_translation', 'translations.id', '=', 'tag_translation.translation_id')
+                         ->join('tags', 'tags.id', '=', 'tag_translation.tag_id')
+                         ->where('tags.name', $tag);
+               }
+          
+               $query->orderBy('translations.id')
                     ->chunk(1000, function ($rows) use (&$first) {
-                         foreach ($rows as $row) {
-                              if (!$first) {
-                              echo ',';
-                              }
-                              echo json_encode($row->key) . ':' . json_encode($row->value);
-                              $first = false;
-                         }
+                    foreach ($rows as $row) {
+                         if (!$first) echo ',';
+                         echo json_encode($row->key) . ':' . json_encode($row->value);
+                         $first = false;
+                    }
                     });
-
+          
                echo '}';
           };
 

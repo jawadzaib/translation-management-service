@@ -208,6 +208,14 @@
                             "type": "string",
                             "example": "en"
                         }
+                    },
+                    {
+                        "name": "tag",
+                        "in": "query",
+                        "description": "Filter by tag",
+                        "schema": {
+                            "type": "web"
+                        }
                     }
                 ],
                 "responses": {
